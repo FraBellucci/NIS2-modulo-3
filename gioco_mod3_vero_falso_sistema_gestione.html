@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>MOD3 – Vero o Falso: Sistema di Gestione NIS2</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#004D40,#00695C,#00796b);min-height:100vh;overflow:hidden;display:flex;justify-content:center;align-items:center}
+.container{background:#fff;width:800px;height:550px;display:flex;flex-direction:column;border-radius:10px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5)}
+.header{background:linear-gradient(135deg,#004D40,#00695C);color:#fff;padding:11px 18px;display:flex;justify-content:space-between;align-items:center;flex-shrink:0}
+.header h1{font-size:15px;font-weight:700}.header p{font-size:11px;opacity:.8;margin-top:1px}
+button{padding:7px 13px;border:none;border-radius:6px;cursor:pointer;font-size:12px;font-weight:600;transition:all .2s}
+.btn-white{background:#fff;color:#004D40}.btn-white:hover{background:#e0f2f1}
+.btn-outline{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4)}.btn-outline:hover{background:rgba(255,255,255,.25)}
+.btn-group{display:flex;gap:8px}
+.content{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.hidden{display:none!important}
+.instr{padding:18px 24px;overflow-y:auto;flex:1}
+.instr h2{color:#004D40;font-size:16px;margin-bottom:10px}
+.instr p,.instr li{font-size:13px;line-height:1.6;color:#444;margin-bottom:5px}
+.instr ul{margin-left:18px;margin-bottom:10px}
+.how-grid{display:flex;gap:10px;margin:10px 0}
+.how-step{flex:1;background:#e0f2f1;border-radius:8px;padding:10px;text-align:center;font-size:12px;color:#004D40;font-weight:600;line-height:1.5}
+.how-step .num{font-size:22px;display:block;margin-bottom:4px}
+.start-btn{background:linear-gradient(135deg,#004D40,#00695C);color:#fff;padding:11px 32px;font-size:14px;border-radius:8px;display:block;margin:14px auto 0;cursor:pointer;border:none;font-weight:600}
+.start-btn:hover{transform:translateY(-2px)}
+.game-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:0}
+.status-bar{display:flex;align-items:center;gap:12px;padding:8px 16px;background:#f5f5f5;border-bottom:1px solid #e0e0e0;flex-shrink:0;font-size:12px}
+.q-badge{background:#00695C;color:#fff;border-radius:20px;padding:2px 12px;font-size:12px;font-weight:700}
+.prog-bar{flex:1;height:6px;background:#eee;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#004D40,#26a69a);border-radius:3px;transition:width .4s}
+.score-lbl{font-weight:700;color:#004D40}
+.card-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 22px;gap:12px}
+.topic-tag{background:#e0f2f1;color:#004D40;border-radius:20px;padding:4px 14px;font-size:11px;font-weight:700}
+.statement-card{background:#fafafa;border:2px solid #b2dfdb;border-radius:12px;padding:16px 20px;width:100%;text-align:center;font-size:15px;color:#333;line-height:1.6;font-weight:500;min-height:85px;display:flex;align-items:center;justify-content:center;transition:all .3s}
+.statement-card.correct-card{border-color:#00695C;background:#e0f2f1}
+.statement-card.wrong-card{border-color:#c62828;background:#ffebee}
+.answer-row{display:flex;gap:20px;justify-content:center}
+.vf-btn{width:130px;height:52px;border-radius:10px;font-size:17px;font-weight:700;cursor:pointer;border:3px solid transparent;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.vf-btn:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 6px 20px rgba(0,0,0,.15)}
+.vf-btn:disabled{cursor:not-allowed;opacity:.6}
+.btn-vero{background:#e0f2f1;border-color:#00695C;color:#004D40}
+.btn-vero:hover:not(:disabled){background:#b2dfdb}
+.btn-falso{background:#ffebee;border-color:#c62828;color:#b71c1c}
+.btn-falso:hover:not(:disabled){background:#ffcdd2}
+.btn-vero.sel-ok,.btn-falso.sel-ok{box-shadow:0 0 0 3px #2e7d32;transform:scale(1.05)}
+.btn-vero.sel-ko,.btn-falso.sel-ko{box-shadow:0 0 0 3px #c62828;opacity:.5}
+.feedback-area{background:#e0f2f1;border-left:4px solid #00695C;border-radius:8px;padding:9px 14px;width:100%;font-size:12px;color:#004D40;line-height:1.5;display:none}
+.feedback-area.show{display:block}
+.next-row{display:flex;justify-content:flex-end;width:100%}
+.next-q-btn{background:linear-gradient(135deg,#004D40,#00695C);color:#fff;padding:8px 22px;font-size:12px;border-radius:7px;cursor:pointer;border:none;font-weight:600;display:none}
+.next-q-btn.show{display:block}
+.result-page{flex:1;display:flex;align-items:center;justify-content:center;padding:20px}
+.result-box{text-align:center;max-width:490px}
+.result-icon{font-size:55px;margin-bottom:12px}
+.result-box h2{font-size:20px;font-weight:700;color:#004D40;margin-bottom:8px}
+.result-box p{font-size:13px;color:#555;line-height:1.6;margin-bottom:15px}
+.result-score{background:#e0f2f1;border-radius:10px;padding:10px 20px;font-size:15px;font-weight:700;color:#004D40;margin-bottom:15px;display:inline-block}
+.result-btns{display:flex;gap:10px;justify-content:center}
+.btn-prim{background:linear-gradient(135deg,#004D40,#00695C);color:#fff;padding:10px 24px;font-size:13px;border-radius:8px;cursor:pointer;border:none;font-weight:600}
+.btn-sec{background:#78909c;color:#fff;padding:10px 24px;font-size:13px;border-radius:8px;cursor:pointer;border:none;font-weight:600}
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div><h1>✅ Sistema di Gestione NIS2: Vero o Falso?</h1><p>Modulo 3 – Governance, responsabilità e misure dell'art. 20 e 21</p></div>
+    <div class="btn-group">
+      <button class="btn-outline" onclick="resetGame()">🔄 Rigioca</button>
+      <button class="btn-white" onclick="window.close()">Torna al corso</button>
+    </div>
+  </div>
+  <div class="content">
+    <div id="instrPage" class="instr">
+      <h2>🎯 Come funziona</h2>
+      <p>Ti vengono presentate <strong>10 affermazioni</strong> sul sistema di gestione della sicurezza NIS2: governance, responsabilità degli organi di gestione e misure dell'art. 21. Decidi se ciascuna è vera o falsa.</p>
+      <div class="how-grid">
+        <div class="how-step"><span class="num">📖</span>Leggi l'affermazione con attenzione</div>
+        <div class="how-step"><span class="num">✅❌</span>Clicca VERO o FALSO</div>
+        <div class="how-step"><span class="num">💡</span>Leggi la spiegazione e vai avanti</div>
+      </div>
+      <ul><li>Temi: artt. 20 e 21 NIS2, ISMS ISO/IEC 27001, UNI/PdR 174:2025, accountability</li><li>Alcune affermazioni contengono errori sottili — leggi con attenzione</li></ul>
+      <button class="start-btn" onclick="startGame()">▶ Inizia</button>
+    </div>
+    <div id="gamePage" class="game-wrap hidden">
+      <div class="status-bar">
+        <span class="q-badge">Domanda <span id="qNum">1</span>/10</span>
+        <div class="prog-bar"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+        <span class="score-lbl">Corrette: <span id="scoreNum">0</span></span>
+      </div>
+      <div class="card-area">
+        <div class="topic-tag" id="topicTag"></div>
+        <div class="statement-card" id="statCard"></div>
+        <div class="answer-row">
+          <button class="vf-btn btn-vero" id="btnVero" onclick="answer(true)">✓ VERO</button>
+          <button class="vf-btn btn-falso" id="btnFalso" onclick="answer(false)">✗ FALSO</button>
+        </div>
+        <div class="feedback-area" id="feedbackArea"></div>
+        <div class="next-row"><button class="next-q-btn" id="nextQBtn" onclick="nextQ()">Domanda successiva →</button></div>
+      </div>
+    </div>
+    <div id="resultPage" class="result-page hidden">
+      <div class="result-box">
+        <div class="result-icon" id="resultIcon"></div>
+        <h2 id="resultTitle"></h2><p id="resultText"></p>
+        <div class="result-score" id="resultScore"></div>
+        <div class="result-btns">
+          <button class="btn-prim" onclick="resetGame()">🔄 Rigioca</button>
+          <button class="btn-sec" onclick="window.close()">Torna al corso</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const QUESTIONS=[
+  {tag:'🏛️ Governance',statement:'Gli organi di amministrazione dei soggetti essenziali e importanti devono approvare le misure di gestione dei rischi e sovraintendere alla loro attuazione.',correct:true,feedback:'VERO. È l\'obbligo di governance dell\'art. 20 NIS2: l\'organo di gestione approva le misure, ne sovraintende l\'attuazione e può essere ritenuto responsabile in caso di violazione.'},
+  {tag:'📋 Modello NIS2',statement:'La NIS2 impone di adottare un documento denominato ufficialmente "Modello Organizzativo NIS2".',correct:false,feedback:'FALSO. La NIS2 non prevede un "modello" tipizzato (a differenza del Modello 231). Impone di adottare misure adeguate e di documentarle: un buon riferimento è un sistema di gestione conforme a ISO/IEC 27001 e alla UNI/PdR 174:2025.'},
+  {tag:'⚖️ Responsabilità',statement:'La responsabilità per l\'attuazione delle misure può essere interamente delegata al reparto IT, sollevando l\'organo di gestione.',correct:false,feedback:'FALSO. La NIS2 prevede la responsabilità diretta degli organi di gestione (art. 20). Si possono assegnare compiti operativi, ma la delega non solleva il vertice dalle proprie responsabilità.'},
+  {tag:'🎓 Formazione',statement:'Gli organi di gestione devono seguire una formazione periodica sui rischi di cybersicurezza e promuovere formazione analoga per i dipendenti.',correct:true,feedback:'VERO. L\'art. 20(2) impone la formazione continua del vertice e incoraggia una formazione analoga per tutto il personale.'},
+  {tag:'📐 Proporzionalità',statement:'Le misure di sicurezza devono essere proporzionate al grado di esposizione al rischio, alle dimensioni del soggetto e alla gravità degli incidenti.',correct:true,feedback:'VERO. È il principio di proporzionalità dell\'art. 21: misure adeguate allo stato dell\'arte, ai costi di attuazione e al livello di rischio del soggetto.'},
+  {tag:'📑 UNI/PdR 174',statement:'La UNI/PdR 174:2025 è una prassi di riferimento italiana, pubblicata con il supporto dell\'ACN, che collega ISO/IEC 27001, NIST CSF 2.0 e gli obblighi NIS2.',correct:true,feedback:'VERO. È il riferimento metodologico italiano più vicino a un "modello" per la conformità NIS2, mappato sulle misure di sicurezza della determinazione ACN.'},
+  {tag:'🔄 Aggiornamento',statement:'Una volta adottato, il sistema di gestione NIS2 non deve essere aggiornato, salvo cambiamenti di legge.',correct:false,feedback:'FALSO. Il sistema va aggiornato in continuo: al variare del contesto interno/esterno, per innovazione tecnologica, a seguito di audit, di nuove normative o di incidenti che hanno minato la sicurezza.'},
+  {tag:'🔐 Misure minime',statement:'Tra le misure minime dell\'art. 21 rientrano la crittografia, l\'autenticazione a più fattori e la sicurezza della catena di approvvigionamento.',correct:true,feedback:'VERO. L\'art. 21(2) elenca, tra le altre: gestione del rischio, gestione degli incidenti, continuità operativa, sicurezza della supply chain, crittografia e autenticazione a più fattori.'},
+  {tag:'📊 Accountability',statement:'L\'accountability richiede di documentare e monitorare le misure di sicurezza in modo verificabile, anche tramite audit.',correct:true,feedback:'VERO. La rendicontazione e la verificabilità sono al cuore del sistema di gestione: documentazione accurata, monitoraggio continuo e audit di conformità.'},
+  {tag:'🧩 ISO 27001',statement:'Un sistema di gestione conforme alla ISO/IEC 27001 non ha alcuna attinenza con la conformità NIS2.',correct:false,feedback:'FALSO. La ISO/IEC 27001 è il riferimento riconosciuto per un ISMS: le misure di sicurezza di base della determinazione ACN sono mappate proprio sui controlli ISO 27001.'},
+];
+let cur=0,score=0,shuffled=[];
+function startGame(){cur=0;score=0;shuffled=[...QUESTIONS].sort(()=>Math.random()-.5);document.getElementById('scoreNum').textContent='0';loadQ();showPage('gamePage');}
+function loadQ(){if(cur>=QUESTIONS.length){endGame();return;}const q=shuffled[cur];document.getElementById('qNum').textContent=cur+1;document.getElementById('progFill').style.width=((cur/QUESTIONS.length)*100)+'%';document.getElementById('topicTag').textContent=q.tag;document.getElementById('statCard').textContent=q.statement;document.getElementById('statCard').className='statement-card';document.getElementById('feedbackArea').className='feedback-area';document.getElementById('nextQBtn').className='next-q-btn';document.getElementById('btnVero').disabled=false;document.getElementById('btnFalso').disabled=false;document.getElementById('btnVero').className='vf-btn btn-vero';document.getElementById('btnFalso').className='vf-btn btn-falso';}
+function answer(val){const q=shuffled[cur];const isCorrect=(val===q.correct);document.getElementById('btnVero').disabled=true;document.getElementById('btnFalso').disabled=true;if(isCorrect){score++;document.getElementById('scoreNum').textContent=score;document.getElementById('statCard').classList.add('correct-card');if(val)document.getElementById('btnVero').className='vf-btn btn-vero sel-ok';else document.getElementById('btnFalso').className='vf-btn btn-falso sel-ok';}else{document.getElementById('statCard').classList.add('wrong-card');if(val)document.getElementById('btnVero').className='vf-btn btn-vero sel-ko';else document.getElementById('btnFalso').className='vf-btn btn-falso sel-ko';}const fb=document.getElementById('feedbackArea');fb.innerHTML='<b>'+(isCorrect?'✓ Corretto!':'✗ Non corretto.')+'</b> '+q.feedback;fb.classList.add('show');document.getElementById('nextQBtn').classList.add('show');}
+function nextQ(){cur++;loadQ();}
+function endGame(){const pct=Math.round((score/QUESTIONS.length)*100);document.getElementById('resultIcon').textContent=pct>=80?'🏆':pct>=50?'👍':'💪';document.getElementById('resultTitle').textContent=pct>=80?'Ottima padronanza!':pct>=50?'Buona base!':'Da ripassare!';document.getElementById('resultText').textContent='Il sistema di gestione NIS2 non è un adempimento formale: è governance (art. 20), misure proporzionate (art. 21), documentazione verificabile e aggiornamento continuo. I riferimenti riconosciuti sono ISO/IEC 27001 e la UNI/PdR 174:2025.';document.getElementById('resultScore').textContent='Corrette: '+score+'/'+QUESTIONS.length;showPage('resultPage');}
+function resetGame(){showPage('instrPage');}
+function showPage(id){['instrPage','gamePage','resultPage'].forEach(p=>document.getElementById(p).classList.add('hidden'));document.getElementById(id).classList.remove('hidden');}
+</script>
+</body>
+</html>
